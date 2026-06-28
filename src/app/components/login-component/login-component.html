@@ -1,0 +1,56 @@
+﻿<div class="login-container">
+  
+  <!-- Contenedor del Logo -->
+  <div class="logo-wrapper">
+    <img src="logo.png" alt="StayCool Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+    <!-- Fallback si el logo no existe aún -->
+    <div class="logo-fallback" style="display: none;">
+      <span>SC</span>
+    </div>
+  </div>
+
+  <!-- Título Principal (Estilo de la pantalla Group 1) -->
+  <h1 class="login-title">Tu refugio digital<br>para el bienestar emocional</h1>
+  <p class="login-subtitle">
+    StayCool te ayuda a encontrar el equilibrio en un mundo conectado. Un espacio seguro para adolescentes y profesionales.
+  </p>
+
+  <!-- Tarjeta de Formulario -->
+  <div class="login-card glass-card">
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Mensajes dinámicos -->
+      <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com">
+        <span *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-text">Ingresa un correo válido.</span>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" formControlName="password" placeholder="••••••••">
+        <span *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-text">La contraseña es obligatoria.</span>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox"> Recuérdame
+        </label>
+        <a href="#" class="forgot-link">¿Olvidíaste tu contraseña?</a>
+      </div>
+
+      <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+        {{ isLoading ? 'Cargando...' : 'Iniciar sesión' }}
+      </button>
+      
+      <div class="register-prompt">
+        ¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+

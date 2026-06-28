@@ -1,0 +1,134 @@
+<div class="dashboard-layout">
+  
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+        <li class="active" (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/patient/sos'); sidebarOpen=false" style="color: #e74c3c; font-weight: bold;"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper" style="max-width: 1200px; margin: 0 auto; padding-top: 10px;">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1 style="font-size: 2rem; margin: 0; font-family: 'Merriweather', serif;">Mensajes</h1>
+          <p style="color: var(--color-text-light);">Comunícate con tu profesional de la salud.</p>
+        </div>
+      </header>
+
+      <div class="chat-container">
+        
+        <!-- Chat List Sidebar -->
+        <div class="chat-sidebar">
+          <div class="chat-list-header">
+            <h3>Tus Conversaciones</h3>
+          </div>
+          <div class="chat-list">
+            <div *ngIf="chats.length === 0" style="padding: 20px; text-align: center; color: var(--color-text-light);">
+              No tienes chats activos.
+            </div>
+            <div class="chat-item" *ngFor="let chat of chats" [class.active]="activeChat?.id === chat.id" (click)="selectChat(chat)">
+              <div class="chat-avatar">{{ getOtherUserName(chat)?.charAt(0) || 'P' }}</div>
+              <div class="chat-info">
+                <h4 class="chat-name">{{ getOtherUserName(chat) }}</h4>
+                <p class="chat-preview">{{ chat.type === 'EMERGENCY' ? 'ðŸ”´ Chat de Emergencia' : 'Consulta general' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Chat Window -->
+        <div class="chat-main" *ngIf="activeChat">
+          <div class="chat-header">
+            <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+              {{ getOtherUserName(activeChat)?.charAt(0) || 'P' }}
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; color: var(--color-text-dark);">{{ getOtherUserName(activeChat) }}</h3>
+              <span style="font-size: 0.8rem; color: var(--color-text-light);">Psicólogo</span>
+            </div>
+          </div>
+          
+          <div class="chat-messages" #scrollMe>
+            <div *ngFor="let msg of activeMessages" 
+                 class="message-bubble" 
+                 [ngClass]="{'message-outgoing': isMyMessage(msg), 'message-incoming': !isMyMessage(msg)}">
+              {{ msg.content }}
+              <div class="message-time">{{ msg.timestamp | date:'shortTime' }}</div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <textarea class="chat-input" 
+                      [(ngModel)]="newMessage" 
+                      (ngModelChange)="cdr.detectChanges()"
+                      placeholder="Escribe un mensaje..."
+                      (keyup.enter)="sendMessage($event)"
+                      rows="1"></textarea>
+            <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() || isSending">
+              <i class="material-icons">send</i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="chat-main empty-chat" *ngIf="!activeChat">
+          <i class="material-icons">forum</i>
+          <p>Selecciona una conversación para empezar a chatear</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+

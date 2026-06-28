@@ -1,0 +1,164 @@
+<div class="dashboard-layout">
+
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="active" (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+        <li (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/patient/sos'); sidebarOpen=false" style="color: #e74c3c; font-weight: bold;"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+      <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>¿Cómo te sientes hoy?</h1>
+          <p>Tómate un momento para registrar tu estado emocional. Tu espacio digital seguro.</p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+
+        <!-- Tarjeta 1: Registro Diario de Emociones -->
+        <section class="card emotion-card">
+          <h3>Registrar Emoción</h3>
+          <p class="subtitle">Cuéntanos un poco sobre tu día</p>
+
+          <form [formGroup]="emotionLogForm" (ngSubmit)="onSubmitEmotion()" class="emotion-form">
+            <div class="emoji-selector" [class.disabled]="!isEditing">
+              <label class="emoji-option">
+                <input type="radio" formControlName="tipoEmocion" value="HAPPY">
+                <span class="emoji">😊</span>
+              </label>
+              <label class="emoji-option">
+                <input type="radio" formControlName="tipoEmocion" value="CALM">
+                <span class="emoji">😌</span>
+              </label>
+              <label class="emoji-option">
+                <input type="radio" formControlName="tipoEmocion" value="SAD">
+                <span class="emoji">😔</span>
+              </label>
+              <label class="emoji-option">
+                <input type="radio" formControlName="tipoEmocion" value="ANXIOUS">
+                <span class="emoji">😟</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label>Notas de tu emoción <span class="required">*</span></label>
+              <textarea formControlName="notasEmocion" placeholder="Hoy me sentí..."></textarea>
+            </div>
+
+            <ng-container *ngIf="isEditing; else editBtn">
+              <button type="submit" class="btn-primary" [disabled]="isLoading || emotionLogForm.invalid">
+                {{ isLoading ? 'Guardando...' : 'Guardar Emoción' }}
+              </button>
+            </ng-container>
+            <ng-template #editBtn>
+              <button type="button" class="btn-primary btn-edit" *ngIf="!isEditing" (click)="toggleEdit()">
+                Registrar Otra Emoción
+              </button>
+            </ng-template>
+
+            <div class="alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+            <div class="alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+          </form>
+        </section>
+
+        <!-- Tarjeta 2: Métricas Diarias -->
+        <section class="card emotion-card">
+          <h3>Métricas Diarias</h3>
+          <p class="subtitle">Registra tus tiempos del día</p>
+
+          <form [formGroup]="dailyMetricsForm" (ngSubmit)="onSubmitMetrics()" class="emotion-form">
+            <div class="metrics-grid">
+              <div class="form-group">
+                <label>minutos Activos</label>
+                <input type="number" formControlName="minutosActivos" min="0">
+              </div>
+              <div class="form-group">
+                <label>minutos Descanso</label>
+                <input type="number" formControlName="minutosDescanso" min="0">
+              </div>
+              <div class="form-group">
+                <label>Horas de Sueño</label>
+                <input type="number" formControlName="horasSueno" min="0" max="24">
+              </div>
+              <div class="form-group">
+                <label>Uso Redes (min)</label>
+                <input type="number" formControlName="minutosRedesSociales" min="0">
+              </div>
+              <div class="form-group full-width">
+                <label>Uso Nocturno Pantallas (min)</label>
+                <input type="number" formControlName="minutosUsoNocturno" min="0">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" [disabled]="isSavingMetrics || dailyMetricsForm.invalid">
+              {{ isSavingMetrics ? 'Guardando...' : 'Actualizar Métricas' }}
+            </button>
+
+            <div class="alert-success" *ngIf="metricsSuccessMessage">{{ metricsSuccessMessage }}</div>
+            <div class="alert-error" *ngIf="metricsErrorMessage">{{ metricsErrorMessage }}</div>
+          </form>
+        </section>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+

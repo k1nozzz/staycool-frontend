@@ -1,0 +1,127 @@
+<div class="dashboard-layout">
+<!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+                <li (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/patient/sos'); sidebarOpen=false" style="color: #e74c3c; font-weight: bold;"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+<!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Tus Logros y Progreso</h1>
+          <p>Revisa tus insignias ganadías y el progreso de tus puntos de bienestar.</p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        <section class="card gamification-card" style="grid-column: span 12;">
+          <h3>Tu Progreso</h3>
+          <div class="gamification-content" *ngIf="gamificationStatus; else loadingGami">
+            <div class="level-indicator">
+              <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path class="circle"
+                  [attr.stroke-dasharray]="getProgressPercentage + ', 100'"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <text x="18" y="20.35" class="percentage">{{ gamificationStatus.PuntosGanados }}</text>
+              </svg>
+              <p class="points-label">Puntos Totales</p>
+              
+              <div class="streak-status">
+                <i class="material-icons">local_fire_department</i> Racha: {{gamificationStatus.RachaActual || 0}} días
+              </div>
+            </div>
+            
+            <div class="achievements">
+              <h4>Insignias Ganadas</h4>
+              <div class="badges-list" *ngIf="logrosDesbloqueados?.length > 0; else noBadges">
+                <div class="badge-item" *ngFor="let logro of logrosDesbloqueados">
+                  <i class="material-icons badge-icon">emoji_events</i>
+                  <div class="badge-info">
+                    <strong>{{ logro.name }}</strong>
+                    <span>¡Objetivo cumplido!</span>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noBadges>
+                <div class="empty-badges-box">
+                  <i class="material-icons">workspace_premium</i>
+                  <p class="text-muted">Aún no tienes insignias. ¡Sigue registrando tus emociones y hábitos saludables para ganar puntos!</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+          <ng-template #loadingGami>
+            <div class="loading-state">Cargando tu progreso estelar...</div>
+          </ng-template>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+

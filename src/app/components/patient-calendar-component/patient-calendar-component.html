@@ -1,0 +1,243 @@
+<div class="dashboard-layout">
+<!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+                <li (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/patient/sos'); sidebarOpen=false" style="color: #e74c3c; font-weight: bold;"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuraci&oacute;n</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+<!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Tu Calendario</h1>
+          <p>Programa tus citas y mantente organizado.</p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid calendar-grid">
+        
+        <!-- Vista de Calendario -->
+        <section class="card calendar-card">
+          <div class="calendar-header">
+            <div class="month-nav">
+              <button class="btn-icon" (click)="previousMonth()">&#9664;</button>
+              <h3>{{ currentDate | date:'MMMM yyyy' }}</h3>
+              <button class="btn-icon" (click)="nextMonth()">&#9654;</button>
+            </div>
+            <div class="header-actions">
+              <button class="btn-primary" (click)="openModal()">
+                <i class="material-icons">add</i> Agregar Evento
+              </button>
+            </div>
+          </div>
+          
+          <div class="calendar-grid-view">
+            <div class="weekday" *ngFor="let day of weekdays">{{ day }}</div>
+            <div class="day" *ngFor="let day of daysInMonth" 
+                 [class.other-month]="!day.isCurrentMonth"
+                 [class.has-event]="day.hasEvent"
+                 [class.today]="day.isToday">
+              <span class="day-number">{{ day.date.getDate() }}</span>
+              <div class="events-container">
+                <div class="event-block" *ngFor="let ev of day.events">
+                  {{ ev.eventDatetime | date:'HH:mm' }} - {{ ev.title }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Sidebar (Today Details) -->
+        <div class="side-panel">
+          <section class="card today-events-card">
+            <h3>Detalles del D&iacute;a</h3>
+            <p class="text-muted" style="margin-top: -10px; margin-bottom: 15px; font-size: 0.9rem;">
+              {{ currentDate | date:'longDate' }}
+            </p>
+            
+            <div class="events-list" *ngIf="todayEvents.length > 0; else noTodayEvents">
+              <!-- Dynamically generated today events -->
+              <div class="event-item" *ngFor="let ev of todayEvents">
+                <div class="event-time">
+                  <strong>Hoy</strong>
+                  <span>{{ ev.eventDatetime | date:'HH:mm' }}</span>
+                </div>
+                <div class="event-info">
+                  <h4>{{ ev.title }}</h4>
+                  <p>{{ ev.description }}</p>
+                  <div class="actions mt-2">
+                    <span class="google-badge" *ngIf="ev.patientGoogleEventId">
+                      <i class="material-icons">check_circle</i> En Google Calendar
+                    </span>
+                    <button type="button" class="btn-sync-small" *ngIf="!ev.patientGoogleEventId" (click)="syncEvent(ev)">
+                      <i class="material-icons">sync</i> Sincronizar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #noTodayEvents>
+              <div class="empty-state text-center" style="padding: 2.5rem 1rem; color: var(--color-text-light); background: #f8fafc; border-radius: 12px; border: 1px díashed #e2e8f0; margin-top: 1rem;">
+                <i class="material-icons" style="font-size: 3.5rem; display: block; margin-bottom: 15px; opacity: 0.8;">inbox</i>
+                <p style="font-size: 1.1rem; margin: 0; color: var(--color-text-dark); font-weight: 500;">Tu d&iacute;a est&aacute; libre</p>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Tiempo perfecto para relajarte.</p>
+              </div>
+            </ng-template>
+
+          </section>
+
+          <!-- Pr&oacute;ximos Compromisos -->
+          <section class="card upcoming-events-card">
+            <h3>Pr&oacute;ximos Compromisos</h3>
+            <div class="events-list" *ngIf="events.length > 0; else noEvents">
+              <div class="event-item" *ngFor="let e of events">
+                <div class="event-time">
+                  <strong>{{ e.eventDatetime | date:'dd MMM' }}</strong>
+                  <span>{{ e.eventDatetime | date:'HH:mm' }}</span>
+                </div>
+                <div class="event-info">
+                  <h4>{{ e.title }}</h4>
+                  <p>{{ e.description }}</p>
+                  <div class="actions mt-2">
+                    <span class="google-badge" *ngIf="e.patientGoogleEventId">
+                      <i class="material-icons">check_circle</i> En Google Calendar
+                    </span>
+                    <button type="button" class="btn-sync-small" *ngIf="!e.patientGoogleEventId" (click)="syncEvent(e)">
+                      <i class="material-icons">sync</i> Sincronizar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noEvents>
+              <div class="empty-state text-center" style="padding: 2.5rem 1rem; color: var(--color-text-light); background: #f8fafc; border-radius: 12px; border: 1px díashed #e2e8f0; margin-top: 1rem;">
+                <i class="material-icons" style="font-size: 3.5rem; display: block; margin-bottom: 15px; opacity: 0.8;">weekend</i>
+                <p style="font-size: 1.1rem; margin: 0; color: var(--color-text-dark); font-weight: 500;">Sin pr&oacute;ximos compromisos</p>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Todo al d&iacute;a por aqu&iacute;.</p>
+              </div>
+            </ng-template>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Event Modal -->
+  <div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>A&ntilde;adir Recordatorio Personal</h2>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>T&iacute;tulo del Evento</label>
+          <input type="text" formControlName="title" placeholder="Ej: Tomar pastilla, Meditar..." class="form-input">
+        </div>
+
+        <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+          <div class="form-group" style="flex: 1;">
+            <label>Fecha</label>
+            <input type="date" formControlName="date" class="form-input">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Hora de Inicio</label>
+            <input type="time" formControlName="time" class="form-input">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Hora de Fin</label>
+            <input type="time" formControlName="endTime" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Ubicaci&oacute;n / Enlace Virtual</label>
+          <input type="text" formControlName="location" placeholder="Opcional" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label>Descripci&oacute;n / Notas</label>
+          <textarea formControlName="description" placeholder="Notas adicionales..." class="form-input" style="min-height: 80px; resize: vertical;"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group" style="margin-bottom: 20px;">
+          <label for="syncGoogle">
+            <input type="checkbox" id="syncGoogle" formControlName="sincronizarConGoogle">
+            Sincronizar con Google Calendar
+          </label>
+        </div>
+
+        <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="eventForm.invalid || isLoading">
+            {{ isLoading ? 'Guardando...' : 'Guardar Evento' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

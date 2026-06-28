@@ -1,0 +1,136 @@
+/* Patient Logros CSS */
+
+.gamification-card {
+  padding: 1.75rem;
+}
+
+.gamification-content {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.level-indicator {
+  flex: 1;
+  min-width: 200px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 150px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke: var(--color-warning);
+  transition: stroke-dasharray 1s ease-out;
+}
+
+.percentage {
+  fill: var(--color-text-main);
+  font-family: var(--font-family-sans);
+  font-size: 0.5em;
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+.points-label {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.streak-status {
+  margin-top: 15px;
+  text-align: center;
+  background: #fffaf0;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: 1px solid #feebc8;
+  color: var(--color-warning);
+  font-weight: bold;
+  font-size: 1.1rem;
+  max-width: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.streak-status i {
+  margin-right: 5px;
+}
+
+.achievements {
+  flex: 2;
+  min-width: 300px;
+}
+
+.achievements h4 {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: var(--color-text-main);
+}
+
+.badges-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.badge-item {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-icon {
+  font-size: 1.5rem;
+  color: var(--color-warning);
+}
+
+.badge-info strong {
+  color: var(--color-text-main);
+  display: block;
+}
+
+.badge-info span {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.empty-badges-box {
+  background: var(--color-bg-primary);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 30px;
+  text-align: center;
+}
+
+.empty-badges-box i {
+  font-size: 2rem;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}
