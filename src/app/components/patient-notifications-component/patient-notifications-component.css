@@ -1,0 +1,232 @@
+@import '../patient-dashboard-component/patient-dashboard-component.css';
+
+/* General layout styles are inherited from global styles */
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-title h2 {
+  color: #2c776a;
+  margin: 0;
+  font-size: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notification-badge {
+  position: relative;
+  cursor: pointer;
+  color: #555;
+}
+
+.notification-badge .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3b9b8b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.notifications-container {
+  max-width: 1000px;
+}
+
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.filter-btn {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 8px 20px;
+  border-radius: 20px;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f5f5f5;
+}
+
+.filter-btn.active {
+  background: #3b9b8b;
+  color: white;
+  border-color: #3b9b8b;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.no-alerts {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+}
+
+.no-alerts i {
+  font-size: 48px;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+.alert-card {
+  background: white;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.alert-card.unread {
+  background: #fdfdfd;
+}
+
+.alert-border {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: transparent;
+}
+
+.alert-border.border-danger {
+  background-color: #e74c3c;
+}
+
+.alert-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.alert-icon i {
+  font-size: 24px;
+}
+
+.icon-bg-danger {
+  background-color: #fdeaea;
+  color: #e74c3c;
+}
+
+.icon-bg-primary {
+  background-color: #e5f4f1;
+  color: #3b9b8b;
+}
+
+.icon-bg-info {
+  background-color: #e6f3f8;
+  color: #3498db;
+}
+
+.icon-bg-warning {
+  background-color: #fdf5e6;
+  color: #f39c12;
+}
+
+.icon-bg-default {
+  background-color: #f0f0f0;
+  color: #7f8c8d;
+}
+
+.alert-content {
+  flex-grow: 1;
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.alert-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.alert-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.alert-content p {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-read {
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 5px 12px;
+  border-radius: 4px;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-read:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.btn-read:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.alert-indicator {
+  width: 10px;
+  height: 10px;
+  background-color: #3b9b8b;
+  border-radius: 50%;
+  margin-left: 20px;
+}
+
