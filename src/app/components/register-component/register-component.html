@@ -1,0 +1,121 @@
+﻿<div class="auth-layout">
+  <!-- Left Side: Branding / Info -->
+  <div class="auth-info">
+    <div class="logo-wrapper">
+      <img src="logo.png" alt="StayCool Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="logo-fallback" style="display: none;">StayCool</div>
+    </div>
+    <h1 class="auth-title">Únete a nuestra comunidad</h1>
+    <p class="auth-subtitle">Crea tu cuenta gratis y comienza a cuidar de tu bienestar emocional hoy mismo.</p>
+  </div>
+
+  <!-- Right Side: Register Form -->
+  <div class="auth-form-container">
+    <div class="auth-card glass-card">
+      
+      <div class="alert-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      <div class="alert-success" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-row" style="display: flex; gap: 15px;">
+          <div class="form-group" style="flex: 2;">
+            <label>Nombre Completo</label>
+            <input 
+              type="text" 
+              formControlName="name" 
+              placeholder="Ej. Juan Pérez"
+              [class.invalid]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
+            >
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Edad</label>
+            <input 
+              type="number" 
+              formControlName="age" 
+              placeholder="Ej. 16"
+              [class.invalid]="registerForm.get('age')?.invalid && registerForm.get('age')?.touched"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input 
+            type="email" 
+            formControlName="email" 
+            placeholder="ejemplo@staycool.com"
+            [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input 
+            type="password" 
+            formControlName="password" 
+            placeholder="Mínimo 6 caracteres"
+            [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>¿Cómo usarás StayCool?</label>
+          <div class="role-selector">
+            <label class="role-option">
+              <input type="radio" formControlName="rolId" [value]="1">
+              <div class="role-card">
+                <span>👤</span>
+                <strong>Paciente</strong>
+              </div>
+            </label>
+            <label class="role-option">
+              <input type="radio" formControlName="rolId" [value]="2">
+              <div class="role-card">
+                <span>🩺</span>
+                <strong>Psicólogo</strong>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Campos condicionales para Psicólogos -->
+        <div class="pro-fields" *ngIf="registerForm.get('rolId')?.value === 2">
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Especialidíad Principal</label>
+              <select formControlName="specialty" [class.invalid]="registerForm.get('specialty')?.invalid && registerForm.get('specialty')?.touched">
+                <option value="">Selecciona...</option>
+                <option value="Psicología Clínica">Psicología Clínica</option>
+                <option value="Psicología Educativa">Psicología Educativa</option>
+                <option value="Terapia Cognitivo-Conductual">Terapia Cognitivo-Conductual</option>
+                <option value="Otra">Otra</option>
+              </select>
+            </div>
+            
+            <div class="form-group half">
+              <label>Empresa o Clínica</label>
+              <input type="text" formControlName="clinicName" placeholder="Nombre del centro" [class.invalid]="registerForm.get('clinicName')?.invalid && registerForm.get('clinicName')?.touched">
+            </div>
+          </div>
+        </div>
+
+
+        <button type="submit" class="btn-primary" [disabled]="isLoading || registerForm.disabled">
+          {{ isLoading ? 'Registrando...' : 'Crear Cuenta' }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+

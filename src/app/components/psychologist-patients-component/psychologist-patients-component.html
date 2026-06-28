@@ -1,0 +1,159 @@
+<div class="dashboard-layout">
+<!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Panel Profesional</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/psychologist/dashboard'); sidebarOpen=false"><i class="material-icons">dashboard</i> Dashboard</li>
+        <li (click)="goTo('/psychologist/patients'); sidebarOpen=false"><i class="material-icons">group</i> Pacientes</li>
+        <li (click)="goTo('/psychologist/requests'); sidebarOpen=false"><i class="material-icons">person_add</i> Solicitudes</li>
+        <li (click)="goTo('/psychologist/materiales'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/psychologist/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+                <li (click)="goTo('/psychologist/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/psychologist/notifications'); sidebarOpen=false" style="display:flex; justify-content:space-between; align-items:center; padding-right: 1.5rem;">
+            <div style="display:flex; align-items:center;"><i class="material-icons">notifications</i> Notificaciones</div>
+            <span *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="background-color: #EF4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 700;">{{count}}</span>
+        </li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/psychologist/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+<!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/psychologist/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/psychologist/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/psychologist/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Monitoreo de Pacientes</h1>
+          <p>Visión general del estado y progreso.</p>
+        </div>
+      </header>
+
+      <div class="patients-container">
+        <!-- Search and Filters -->
+        <div class="filters-bar card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+          <div class="search-box">
+            <i class="material-icons search-icon">search</i>
+            <input (keyup)="applyFilter($event)" placeholder="Buscar paciente por nombre..." #input>
+          </div>
+          <div class="status-filters">
+            <span class="status-badge bg-gray" style="cursor:pointer;" (click)="filterByStatus('all')">Todos</span>
+            <span class="status-badge bg-red-light color-red" style="cursor:pointer;" (click)="filterByStatus('Crítico')"><span class="dot red"></span> Crítico</span>
+            <span class="status-badge bg-blue-light color-blue" style="cursor:pointer;" (click)="filterByStatus('Observación')"><span class="dot blue"></span> Observación</span>
+            <span class="status-badge bg-green-light color-green" style="cursor:pointer;" (click)="filterByStatus('Estable')"><span class="dot green"></span> Estable</span>
+          </div>
+        </div>
+
+        <!-- Material Table -->
+        <div class="mat-elevation-z0 table-container card">
+          <table mat-table [dataSource]="dataSource" matSort>
+
+            <!-- Paciente Column -->
+            <ng-container matColumnDef="paciente">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> PACIENTE </th>
+                <td mat-cell *matCellDef="let element">
+                  <div class="patient-cell" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div *ngIf="!element.profilePictureUrl" class="avatar-initials" [ngClass]="{'bg-red': element.estado === 'CRITICAL', 'bg-blue': element.estado !== 'CRITICAL'}" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; flex-shrink: 0;">{{ element.initials }}</div>
+                    <img *ngIf="element.profilePictureUrl" [src]="element.profilePictureUrl" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                    <div>
+                      <div class="font-bold">{{element.nombrePaciente}}</div>
+                      <div class="text-gray text-small">ID: P-{{element.pacienteId}}</div>
+                    </div>
+                  </div>
+                </td>
+            </ng-container>
+
+            <!-- Estado Column -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="status-badge" [ngClass]="{'bg-red-light color-red': element.estado === 'CRITICAL' || element.estado === 'Crítico', 'bg-green-light color-green': element.estado === 'ESTABLE' || element.estado === 'Estable' || element.estado === 'ACTIVO', 'bg-blue-light color-blue': element.estado === 'OBSERVACION'}">
+                  <span class="dot" [ngClass]="{'red': element.estado === 'CRITICAL', 'green': element.estado === 'ESTABLE' || element.estado === 'ACTIVO', 'blue': element.estado === 'OBSERVACION'}"></span>
+                  {{element.estado}}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Ultima Actividad Column -->
+            <ng-container matColumnDef="ultimaActividad">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> ÚLTIMA ACTIVIDAD </th>
+              <td mat-cell *matCellDef="let element"> {{element.ultimaActividad}} </td>
+            </ng-container>
+
+            <!-- Tendencia Column -->
+            <ng-container matColumnDef="tendencia">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> TENDENCIA </th>
+              <td mat-cell *matCellDef="let element">
+                <span class="text-gray">{{element.tendencia}}</span>
+              </td>
+            </ng-container>
+
+            <!-- Acciones Column -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+              <td mat-cell *matCellDef="let element">
+                <div class="actions-cell">
+                  <button mat-icon-button class="action-btn" (click)="goTo('/psychologist/patient/' + element.pacienteId)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn primary-action" (click)="goTo('/psychologist/patient/' + element.pacienteId + '?tab=chat')">
+                    <mat-icon>chat</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <!-- Fila cuando no hay datos -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="5" style="text-align: center; padding: 20px;">No hay pacientes que coincidan con la búsqueda.</td>
+            </tr>
+          </table>
+
+          <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+

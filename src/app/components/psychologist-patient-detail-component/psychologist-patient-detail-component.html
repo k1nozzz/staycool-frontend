@@ -1,0 +1,222 @@
+<div class="dashboard-layout">
+<!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Panel Profesional</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/psychologist/dashboard'); sidebarOpen=false"><i class="material-icons">dashboard</i> Dashboard</li>
+        <li (click)="goTo('/psychologist/patients'); sidebarOpen=false"><i class="material-icons">group</i> Pacientes</li>
+        <li (click)="goTo('/psychologist/requests'); sidebarOpen=false"><i class="material-icons">person_add</i> Solicitudes</li>
+        <li (click)="goTo('/psychologist/materiales'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/psychologist/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+                <li (click)="goTo('/psychologist/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/psychologist/notifications'); sidebarOpen=false" style="display:flex; justify-content:space-between; align-items:center; padding-right: 1.5rem;">
+            <div style="display:flex; align-items:center;"><i class="material-icons">notifications</i> Notificaciones</div>
+            <span *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="background-color: #EF4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 700;">{{count}}</span>
+        </li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/psychologist/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+<!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/psychologist/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/psychologist/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/psychologist/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper" *ngIf="detail">
+      <header class="top-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="welcome-text">
+          <h1 style="margin: 0;">Detalle del Paciente</h1>
+        </div>
+        <button class="btn-primary" (click)="exportPdf()">
+          <i class="material-icons">insert_drive_file</i> Exportar Informe
+        </button>
+      </header>
+
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="left-column">
+          <!-- Profile Card -->
+          <div class="profile-card card">
+            <div class="profile-header bg-blue-light"></div>
+            <div class="profile-avatar">
+              <img src="https://ui-avatars.com/api/?name={{detail.nombre}}&background=random" alt="Avatar">
+            </div>
+            <div class="profile-info">
+              <h2>{{detail.nombre}}</h2>
+              <p class="text-gray">{{detail.edad}} años | Ingreso: {{detail.fechaIngreso}}</p>
+              <div class="alert-status" style="margin-top: 10px;">
+                <span>Estado de Alerta</span>
+                <span class="status-badge" [ngClass]="{'bg-red-light color-red': detail.estadoAlerta === 'Crítico', 'bg-green-light color-green': detail.estadoAlerta === 'Estable'}">
+                  {{detail.estadoAlerta}}
+                </span>
+              </div>
+              <div class="streak-status" style="margin-top: 15px; display: inline-flex; align-items: center; background: #fffaf0; padding: 5px 12px; border-radius: 20px; border: 1px solid #feebc8; color: #dd6b20; font-weight: bold; font-size: 0.9rem;">
+                <i class="material-icons" style="margin-right: 5px;">local_fire_department</i> Racha: {{detail.rachaActual}} días
+              </div>
+            </div>
+          </div>
+
+          <!-- Logros Desbloqueados Card -->
+          <div class="notes-card card" style="margin-top: 20px;">
+            <div class="card-header">
+              <h3><i class="material-icons">emoji_events</i> Insignias Desbloqueadas</h3>
+            </div>
+            <div *ngIf="detail.logrosDesbloqueados && detail.logrosDesbloqueados.length > 0; else noBadges" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+              <div *ngFor="let logro of detail.logrosDesbloqueados" style="background: #ebf8ff; color: #2b6cb0; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; border: 1px solid #bee3f8; display: flex; align-items: center; gap: 5px;">
+                <i class="material-icons" style="font-size: 14px;">star</i> {{ logro }}
+              </div>
+            </div>
+            <ng-template #noBadges>
+              <p style="color: var(--color-text-light); font-size: 0.9rem; margin-top: 15px;">El paciente no ha desbloqueado insignias de hábitos saludables aún.</p>
+            </ng-template>
+          </div>
+
+          <!-- Clinical Notes Card -->
+          <div class="notes-card card" style="margin-top: 20px;">
+            <div class="card-header">
+            <h3><i class="material-icons">edit_note</i> Notas Clínicas</h3>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+              <span *ngIf="savedStatus" style="color: #38b2ac; font-size: 0.85rem; font-weight: 500; transition: opacity 0.3s;">{{savedStatus}}</span>
+              <i class="material-icons edit-icon" style="margin-left: 0; color: var(--color-primary); cursor: pointer;" (click)="saveNotes()" title="Guardar Notas">save</i>
+            </div>
+          </div>
+          <textarea class="notes-textarea" [(ngModel)]="detail.notasClinicas" (blur)="saveNotes()" placeholder="Añade observaciones sobre el progreso del paciente..."></textarea>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+          <!-- Actividad Física Chart -->
+          <div class="chart-card card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3>Actividad Física</h3>
+              <span style="font-size: 0.8rem; color: var(--color-text-light);">minutos activos por día</span>
+            </div>
+            <span class="text-gray text-small">últimos 7 días</span>
+          </div>
+          
+          <div class="bar-chart-container">
+            <div class="bar-item" *ngFor="let val of historialEmocionalArray; let i = index">
+              <span style="font-size: 11px; color: var(--color-text-light); font-weight: 600; margin-bottom: 2px;">{{ val }}</span>
+              <div class="bar-bg" style="height: 100%; display: flex; align-items: flex-end; width: 100%;">
+                <div class="bar-fill bg-teal" [style.height.%]="val === 0 ? 2 : (val / maxHistorial) * 100"></div>
+              </div>
+              <span class="bar-label">{{ diasSemana[i] }}</span>
+            </div>
+          </div>
+          </div>
+
+          <!-- Horas de Sueño Chart -->
+          <div class="chart-card card" style="margin-top: 20px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3>Horas de Sueño</h3>
+              <span style="font-size: 0.8rem; color: var(--color-text-light);">Horas dormidas por día</span>
+            </div>
+            <span class="text-gray text-small">últimos 7 días</span>
+          </div>
+          
+          <div class="bar-chart-container">
+            <div class="bar-item" *ngFor="let val of historialHorasSuenoArray; let i = index">
+              <span style="font-size: 11px; color: var(--color-text-light); font-weight: 600; margin-bottom: 2px;">{{ val }}h</span>
+              <div class="bar-bg" style="height: 100%; display: flex; align-items: flex-end; width: 100%;">
+                <div class="bar-fill" style="background-color: #667eea;" [style.height.%]="val === 0 ? 2 : (val / maxSueno) * 100"></div>
+              </div>
+              <span class="bar-label">{{ diasSemana[i] }}</span>
+            </div>
+          </div>
+          </div>
+
+          <!-- Uso de Redes Sociales Chart -->
+          <div class="chart-card card" style="margin-top: 20px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3>Uso de Redes Sociales</h3>
+              <span style="font-size: 0.8rem; color: var(--color-text-light);">minutos en redes por día (Meta: {{detail?.metaDiaria || 60}} min)</span>
+            </div>
+            <span class="text-gray text-small">últimos 7 días</span>
+          </div>
+          
+          <div class="bar-chart-container">
+            <div class="bar-item" *ngFor="let val of historialUsoRedesArray; let i = index">
+              <span style="font-size: 11px; color: var(--color-text-light); font-weight: 600; margin-bottom: 2px;">{{ val }}</span>
+              <div class="bar-bg" style="height: 100%; display: flex; align-items: flex-end; width: 100%;">
+                <div class="bar-fill" [ngClass]="{'bg-red': val > (detail?.metaDiaria || 60), 'bg-orange': val <= (detail?.metaDiaria || 60)}" [style.background-color]="val > (detail?.metaDiaria || 60) ? '#e53e3e' : '#ed8936'" [style.height.%]="val === 0 ? 2 : (val / maxRedes) * 100"></div>
+              </div>
+              <span class="bar-label">{{ diasSemana[i] }}</span>
+            </div>
+          </div>
+          </div>
+
+          <!-- Diario Emocional (Notas del paciente) -->
+          <div class="timeline-card card" style="margin-top: 20px;">
+            <div class="card-header">
+              <h3>Diario Emocional del Paciente</h3>
+              <span style="font-size: 0.8rem; color: var(--color-text-light);">Registros directos</span>
+            </div>
+            <div class="timeline" *ngIf="detail?.historialEmocionalDetallado && detail!.historialEmocionalDetallado.length > 0">
+              <div class="timeline-item" *ngFor="let emo of detail?.historialEmocionalDetallado">
+                <div class="timeline-icon bg-blue-light color-blue" style="background: transparent;">
+                  <i class="material-icons" *ngIf="emo.emocion === 'HAPPY'">mood</i>
+                  <i class="material-icons" *ngIf="emo.emocion === 'CALM'">sentiment_satisfied</i>
+                  <i class="material-icons" *ngIf="emo.emocion === 'SAD'">sentiment_dissatisfied</i>
+                  <i class="material-icons" *ngIf="emo.emocion === 'ANXIOUS'">sentiment_very_dissatisfied</i>
+                </div>
+                <div class="timeline-content">
+                  <h4 style="color: var(--color-text-main);">Estado: {{ emo.emocion }}</h4>
+                  <p *ngIf="emo.notas" style="font-style: italic; background-color: #f7fafc; padding: 10px; border-radius: 8px; margin-top: 5px;">"{{ emo.notas }}"</p>
+                  <p *ngIf="!emo.notas" style="color: var(--color-text-light);">Sin notas registradas.</p>
+                  <span class="time">{{ emo.fecha }}</span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!detail?.historialEmocionalDetallado || detail!.historialEmocionalDetallado.length === 0" style="padding: 30px; text-align: center; color: var(--color-text-light);">
+              <i class="material-icons" style="font-size: 2rem; opacity: 0.5;">history</i>
+              <p style="margin-top: 10px;">El paciente aún no ha registrado emociones.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+

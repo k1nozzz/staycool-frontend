@@ -1,0 +1,145 @@
+﻿<div class="dashboard-layout">
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Panel Profesional</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/psychologist/dashboard'); sidebarOpen=false"><i class="material-icons">dashboard</i> Dashboard</li>
+        <li (click)="goTo('/psychologist/patients'); sidebarOpen=false"><i class="material-icons">group</i> Pacientes</li>
+        <li class="active" (click)="goTo('/psychologist/requests'); sidebarOpen=false"><i class="material-icons">person_add</i> Solicitudes</li>
+        <li (click)="goTo('/psychologist/materiales'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/psychologist/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+                <li (click)="goTo('/psychologist/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/psychologist/notifications'); sidebarOpen=false" style="display:flex; justify-content:space-between; align-items:center; padding-right: 1.5rem;">
+            <div style="display:flex; align-items:center;"><i class="material-icons">notifications</i> Notificaciones</div>
+            <span *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="background-color: #EF4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 700;">{{count}}</span>
+        </li>
+        <li class="spacer"></li>
+        <li (click)="goTo('/psychologist/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/psychologist/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/psychologist/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/psychologist/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Solicitudes Pendientes</h1>
+          <p>Revisa y acepta a los pacientes que han solicitado vincularse contigo.</p>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div *ngIf="successMessage" class="success-message" style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="error-message" style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+        {{ errorMessage }}
+      </div>
+
+      <div class="dashboard-grid" style="grid-template-columns: 1fr;">
+        <section class="table-section glass-card" style="padding: 1.5rem; border-radius: 12px; background-color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          <div class="table-header" style="margin-bottom: 1rem;">
+            <h3 style="color: var(--color-primary); margin: 0;">Pacientes Pendientes</h3>
+          </div>
+          
+          <div class="mat-elevation-z2" style="border-radius: 8px; overflow: hidden;">
+            <table mat-table [dataSource]="dataSource" matSort style="width: 100%;">
+
+              <!-- Paciente Column -->
+              <ng-container matColumnDef="paciente">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="color: var(--color-primary); font-weight: bold;"> PACIENTE </th>
+                <td mat-cell *matCellDef="let element" style="padding: 12px 16px;">
+                  <div class="patient-cell" style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="avatar-initials bg-blue" *ngIf="!element.pacienteFotoUrl" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold; flex-shrink: 0; background-color: var(--color-primary); color: white;">
+                      {{ element.pacienteNombre.charAt(0).toUpperCase() }}
+                    </div>
+                    <img *ngIf="element.pacienteFotoUrl" [src]="element.pacienteFotoUrl" alt="Avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                    <span style="font-weight: 500; color: #1e293b;">{{ element.pacienteNombre }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Fecha Column -->
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="color: var(--color-primary); font-weight: bold;"> FECHA DE SOLICITUD </th>
+                <td mat-cell *matCellDef="let element" style="color: #64748b; padding: 12px 16px;"> {{element.fecha}} </td>
+              </ng-container>
+
+              <!-- Mensaje Column -->
+              <ng-container matColumnDef="mensaje">
+                <th mat-header-cell *matHeaderCellDef style="color: var(--color-primary); font-weight: bold;"> MENSAJE </th>
+                <td mat-cell *matCellDef="let element" style="padding: 12px 16px;"> 
+                  <div style="max-width: 250px; white-space: normal; word-wrap: break-word; color: #475569; font-style: italic;">
+                    {{ element.mensaje ? '"' + element.mensaje + '"' : 'Sin mensaje adicional' }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Acciones Column -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef style="color: var(--color-primary); font-weight: bold;"> ACCIONES </th>
+                <td mat-cell *matCellDef="let element" style="padding: 12px 16px;">
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button mat-flat-button color="primary" (click)="aceptar(element.id)" style="background-color: #10b981; border-radius: 8px;">
+                      <mat-icon>check</mat-icon> Aceptar
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="rechazar(element.id)" style="border-radius: 8px; border-color: #ef4444; color: #ef4444;">
+                      <mat-icon>close</mat-icon> Rechazar
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+              <!-- Fila mostrada cuando no hay datos -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4" style="text-align: center; padding: 3rem; color: #64748b; font-size: 1.1rem;">
+                  No tienes solicitudes pendientes en este momento.
+                </td>
+              </tr>
+            </table>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons style="background-color: transparent;"></mat-paginator>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+
