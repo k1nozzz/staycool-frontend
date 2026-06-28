@@ -1,0 +1,77 @@
+/* Patient Meta CSS */
+.meta-container {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+
+
+.goal-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.goal-input-group { display: flex; flex-direction: column; gap: 8px; }
+.goal-input-group label { font-weight: 600; color: var(--color-text-main); font-size: 0.9rem; }
+
+.input-goal {
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-main);
+  font-size: 1rem;
+  max-width: 180px;
+  transition: border-color 0.2s;
+}
+.input-goal:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px rgba(23,184,144,0.15); }
+
+.success-message { color: var(--color-success); font-weight: 500; font-size: 0.9rem; }
+
+.history-section h3 { font-size: 1.3rem; color: var(--color-text-main); margin-bottom: 0.5rem; }
+.subtitle { color: var(--color-text-muted); margin-bottom: 1rem; font-size: 0.875rem; }
+
+.loading-state, .empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.log-list { display: flex; flex-direction: column; gap: 10px; }
+
+.log-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.log-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.log-date { font-weight: 600; font-size: 0.95rem; color: var(--color-text-main); }
+.log-details { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; }
+.status-icon.success i { color: var(--color-success); font-size: 1.6rem; }
+.status-icon.fail    i { color: var(--color-danger);  font-size: 1.6rem; }
+
+/* Mat Table override */
+.mat-mdc-table { width: 100%; border-radius: var(--border-radius-md); overflow: hidden; }
+
+@media (max-width: 600px) {
+  .log-card { flex-direction: column; align-items: flex-start; }
+  .goal-card { padding: 1.25rem; }
+  .input-goal { max-width: 100%; width: 100%; }
+}
