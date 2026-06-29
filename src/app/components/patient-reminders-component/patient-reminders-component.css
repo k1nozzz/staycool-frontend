@@ -1,0 +1,324 @@
+@import '../patient-dashboard-component/patient-dashboard-component.css';
+
+/* General layout styles are inherited */
+
+.bg-light {
+  background-color: #f7faf8;
+}
+
+.top-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notification-badge {
+  position: relative;
+  cursor: pointer;
+  color: #555;
+}
+
+.notification-badge .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3b9b8b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.reminders-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.reminders-header {
+  margin-bottom: 30px;
+  color: #2c776a;
+}
+
+.reminders-header h2 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.reminders-header p {
+  color: #666;
+}
+
+.reminders-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .reminders-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reminders-card {
+  padding: 25px;
+}
+
+.reminders-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+.reminders-card h3 i {
+  color: #3b9b8b;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b9b8b;
+}
+
+.days-selector {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.day-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.day-circle:hover {
+  border-color: var(--color-primary, #3b9b8b);
+  color: var(--color-primary, #3b9b8b);
+  background-color: rgba(59, 155, 139, 0.05);
+}
+
+.day-circle.selected {
+  background-color: var(--color-primary, #3b9b8b);
+  border-color: var(--color-primary, #3b9b8b);
+  color: white;
+  box-shadow: 0 4px 10px rgba(59, 155, 139, 0.3);
+  transform: scale(1.05);
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #666;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancel:hover {
+  background: #f5f5f5;
+}
+
+.btn-save {
+  flex: 2;
+  background: #3b9b8b;
+  border: none;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #2c776a;
+}
+
+.btn-save:disabled {
+  background: #9bd6cb;
+  cursor: not-allowed;
+}
+
+/* Activos */
+.actives-card {
+  background: #f0f7f5;
+}
+
+.no-reminders {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.active-reminder-item {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.reminder-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.reminder-info p {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.badge-freq {
+  background: #e5f4f1;
+  color: #3b9b8b;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.reminder-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.btn-delete:hover {
+  color: #c0392b;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #3b9b8b;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #3b9b8b;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
