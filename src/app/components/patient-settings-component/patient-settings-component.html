@@ -1,0 +1,174 @@
+<div class="dashboard-layout">
+
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+                <li (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        <li (click)="goTo('/patient/sos'); sidebarOpen=false" style="color: #e74c3c; font-weight: bold;"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/reminders'); sidebarOpen=false"><i class="material-icons">spa</i> Relax</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        <li class="spacer"></li>
+        <li class="active" (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+            <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <header class="top-header">
+        <div class="welcome-text">
+          <h1>Configuración</h1>
+          <p>Administra tu perfil y preferencias de cuenta.</p>
+        </div>
+      </header>
+
+      <div class="settings-layout">
+
+        <!-- Card: Perfil -->
+        <div class="card">
+          <h3 class="card-title">Información del Perfil</h3>
+
+          <div class="profile-photo-section" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="photo-wrapper" style="position: relative; width: 80px; height: 80px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary-dark); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: bold; overflow: hidden; flex-shrink: 0; box-shadow: var(--shadow-sm);">
+              <img *ngIf="user?.profilePictureUrl" [src]="user?.profilePictureUrl" style="width: 100%; height: 100%; object-fit: cover;">
+              <span *ngIf="!user?.profilePictureUrl">{{ userInitial }}</span>
+            </div>
+            <div class="photo-actions">
+              <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+              <button class="btn-primary" (click)="fileInput.click()" style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-bottom: 0.5rem;" [disabled]="isUploading">
+                <i class="material-icons" style="font-size: 1rem; margin-right: 4px; vertical-align: middle;">upload</i>
+                {{ isUploading ? 'Subiendo...' : 'Cambiar foto' }}
+              </button>
+              <br>
+              <button class="btn-icon" (click)="removeProfilePicture()" *ngIf="user?.profilePictureUrl" style="color: var(--color-danger); padding: 0;">
+                <i class="material-icons" style="font-size: 0.9rem; vertical-align: middle;">delete</i> Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-fields" [formGroup]="profileForm">
+            <div class="form-group">
+              <label>NOMBRE COMPLETO</label>
+              <input type="text" class="form-input" formControlName="name" placeholder="Tu nombre completo">
+              <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="field-error">El nombre es obligatorio (mín. 2 caracteres).</div>
+            </div>
+
+            <div class="form-group">
+              <label>CORREO ELECTRÓNICO</label>
+              <input type="email" class="form-input" formControlName="email" placeholder="tu@correo.com">
+              <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="field-error">Ingresa un correo electrónico válido.</div>
+            </div>
+
+            <div class="form-group">
+              <label>EDAD</label>
+              <input type="number" class="form-input" formControlName="age" placeholder="Ej. 25" style="max-width: 140px;">
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving || profileForm.invalid">
+              {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Card: Seguridad -->
+        <div class="card">
+          <h3 class="card-title">Seguridad y Contraseña</h3>
+
+          <div class="responsive-row" [formGroup]="passwordForm">
+            <div class="form-group" style="flex: 1;">
+              <label>CONTRASEÑA ACTUAL</label>
+              <input type="password" class="form-input" formControlName="currentPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>NUEVA CONTRASEÑA</label>
+              <input type="password" class="form-input" formControlName="newPassword" placeholder="••••••••">
+              <div *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" class="field-error">Mínimo 6 caracteres.</div>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>CONFIRMAR CONTRASEÑA</label>
+              <input type="password" class="form-input" formControlName="confirmPassword" placeholder="••••••••">
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" (click)="changePassword()" [disabled]="isChangingPassword || passwordForm.invalid">
+              {{ isChangingPassword ? 'Cambiando...' : 'Cambiar Contraseña' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Card: Zona peligro -->
+        <div class="card" style="border-left: 4px solid var(--color-danger);">
+          <h3 class="card-title" style="color: var(--color-danger);">Zona de Peligro</h3>
+          <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Una vez eliminada tu cuenta, no podrás recuperar tu información.</p>
+          <button class="btn-danger-solid" (click)="deleteAccount()">
+            <i class="material-icons">delete_forever</i> Eliminar Cuenta
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div *ngIf="successMessage || errorMessage" class="toast-notification" [ngClass]="{'success': successMessage, 'error': errorMessage}">
+      <i class="material-icons">{{ successMessage ? 'check_circle' : 'warning' }}</i>
+      <span>{{ successMessage || errorMessage }}</span>
+    </div>
+
+  </main>
+</div>
+
+
+
+
+
+
+
