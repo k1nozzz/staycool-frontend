@@ -1,0 +1,124 @@
+<div class="dashboard-layout">
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-circle">
+        <img src="logo.png" alt="StayCool"/>
+      </div>
+      <h2>Serenity</h2>
+      <p>Santuario Digital</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li (click)="goTo('/patient/dashboard'); sidebarOpen=false"><i class="material-icons">home</i> Home</li>
+        <li (click)="goTo('/patient/meta'); sidebarOpen=false"><i class="material-icons">flag</i> Meta diaria</li>
+        <li (click)="goTo('/patient/recursos'); sidebarOpen=false"><i class="material-icons">folder</i> Materiales</li>
+        <li (click)="goTo('/patient/calendar'); sidebarOpen=false"><i class="material-icons">calendar_today</i> Calendario</li>
+        <li (click)="goTo('/patient/logros'); sidebarOpen=false"><i class="material-icons">emoji_events</i> Logros</li>
+        <li (click)="goTo('/patient/specialists'); sidebarOpen=false"><i class="material-icons">psychology</i> Especialistas</li>
+        <li (click)="goTo('/patient/chat'); sidebarOpen=false"><i class="material-icons">chat</i> Mensajes</li>
+        
+        <li class="active" style="color: #e74c3c; font-weight: bold;" (click)="goTo('/patient/sos'); sidebarOpen=false"><i class="material-icons">emergency</i> S.O.S</li>
+        <li (click)="goTo('/patient/reminders'); sidebarOpen=false"><i class="material-icons">spa</i> Relax</li>
+        <li (click)="goTo('/patient/notifications'); sidebarOpen=false"><i class="material-icons">notifications</i> Notificaciones</li>
+        
+        <li class="spacer"></li>
+        <li (click)="goTo('/patient/settings'); sidebarOpen=false"><i class="material-icons">settings</i> Configuración</li>
+        <li (click)="logout()"><i class="material-icons">logout</i> Salir</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="top-nav-bar">
+      <button class="hamburger-btn" (click)="sidebarOpen = !sidebarOpen">
+        <i class="material-icons">menu</i>
+      </button>
+      <div class="top-bar-actions">
+        <div class="points-badge" *ngIf="gamificationStatus">
+          <i class="material-icons" style="color: var(--color-warning); font-size:1.1rem;">star</i>
+          <strong>{{gamificationStatus.PuntosGanados}}</strong> pts
+        </div>
+        
+        <div class="top-bar-icon" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc;" (click)="goTo('/patient/notifications')">
+          <i class="material-icons" style="color: var(--color-text-light);">notifications</i>
+          <span class="notification-badge" *ngIf="(unreadAlerts$ | async) as count" [hidden]="count === 0" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{count}}</span>
+        </div>
+
+        <button class="icon-btn" (click)="goTo('/patient/settings')">
+          <i class="material-icons">settings</i>
+        </button>
+        <div class="top-bar-avatar" (click)="goTo('/patient/settings')" style="padding: 0; overflow: hidden;">
+          <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <span *ngIf="!profilePictureUrl">{{ userInitial }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper" style="max-width: 1000px; margin: 0 auto; padding-top: 10px;">
+      <div class="sos-content">
+
+
+        <div class="sos-header text-center">
+          <h1>S.O.S - Necesito Ayuda Ahora</h1>
+          <p>No estás solo. Si sientes que la situación te supera, utiliza estas opciones para conectar con apoyo inmediato.</p>
+        </div>
+
+        <div class="sos-options">
+          <div class="sos-card card primary-card">
+            <div class="card-icon">
+              <i class="material-icons">support_agent</i>
+            </div>
+            <div class="card-text">
+              <h3>Hablar con mi Psicólogo</h3>
+              <p>Tu profesional de cabecera recibirá una alerta crítica inmediata y se habilitará una sala de chat de emergencia.</p>
+              <button class="btn-sos-primary" (click)="openConfirmModal()">Solicitar Chat de Emergencia</button>
+            </div>
+          </div>
+
+          <div class="sos-card card secondary-card">
+            <h3>Líneas de Apoyo Nacional</h3>
+            <p>Disponibles 24/7, confidenciales y gratuitas.</p>
+            
+            <div class="helpline">
+              <div>
+                <strong>Línea 100</strong>
+                <span>Ministerio de la Mujer y Poblaciones Vulnerables</span>
+              </div>
+              <a href="tel:100" class="phone-btn" title="Llamar al 100"><i class="material-icons">call</i></a>
+            </div>
+
+            <div class="helpline">
+              <div>
+                <strong>Línea 113 - Opción 5</strong>
+                <span>Ministerio de Salud (MINSA) - Salud Mental</span>
+              </div>
+              <a href="tel:113" class="phone-btn" title="Llamar al 113"><i class="material-icons">call</i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de confirmación -->
+  <div class="modal-overlay" *ngIf="showConfirmModal">
+    <div class="modal-content text-center">
+      <div class="modal-icon">
+        <i class="material-icons">warning</i>
+      </div>
+      <h2>¿Estás seguro?</h2>
+      <p>Esto enviará una alerta urgente a tu psicólogo para iniciar una sesión de chat inmediata. Úsalo solo en casos de verdadera necesidad.</p>
+      <div class="modal-actions">
+        <button class="btn-danger w-100" (click)="requestEmergencyChat()" [disabled]="isLoading">
+          {{ isLoading ? 'Enviando Alerta...' : 'Sí, necesito ayuda ahora' }}
+        </button>
+        <button class="btn-outline w-100 mt-2" (click)="closeConfirmModal()" [disabled]="isLoading">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
